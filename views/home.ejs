@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="
+    sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/header.css'>
+    <link rel='stylesheet' href='/stylesheets/footer.css'>
+
+    <link rel='stylesheet' href='/stylesheets/home.css'>
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <script>
+        function preusmjeri(id) {
+        window.location.href = "/artikal/prikaz/"+id;
+        }
+    </script>
+
+
+</head>
+<header>
+    <%- include('header.ejs', {tip : tip,id: id}) %>
+
+</header>
+
+<%- include('searchbar.ejs') %>
+
+
+
+
+
+<div class="container menu" >
+
+    <div class="row" >
+        <div class="col-md-2">
+    <div class="sidebar container ">
+    <form action="/home" method="GET">
+    <div class="row">
+        <div class="col">
+            <select name="sortiranje"  class="form-select" id="filtriraj">
+                <option selected disabled>Poredaj po</option>
+                <option value="novi">NAJNOVIJE </option>
+                <option value="stari">NAJSTARIJE</option>
+                <option value="najnize">CIJENI - NAJNIŽOJ</option>
+                <option value="najvise">CIJENI - NAJVIŠOJ</option>
+
+            </select>
+        </div>
+    </div>
+    <div class="row">
+
+    <div class="col">
+<select name="kategorija" class="form-select">
+    <option selected disabled>Kategorije</option>
+    <%for (let i = 0; i < kategorije.length; i++) {%>
+        <option value="<%=kategorije[i].id%>"> <%=kategorije[i].naziv%></option>
+    <%}%>
+</select>
+    </div>
+    </div>
+    <div class="row">
+        <div class="col">
+
+
+    <div class="form-group">
+    <input name="mincijena" placeholder="Najniža cijena" type="number" min="0" class="form-control" id="cijena_od">
+    <input name="maxcijena" placeholder="Najveća cijena" type="number" class="form-control" id="cijena_do">
+</div>
+    </div>
+    </div>
+    <div class="row">
+    <div class="col" >
+
+    <select name="grad" class="form-select">
+    <option selected disabled>Grad</option>
+        <%
+        for (let i = 0; i < gradovi.length; i++) {%>
+            <option> <%= gradovi[i].city%>  </option>
+        <%}%>
+
+</select>
+    </div>
+    </div>
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <button type="submit" class="btn btn-success"> <i class="fas fa-sync-alt"></i> Filtriraj</button>
+        </div>
+    </div>
+    </form>
+    </div>
+        </div>
+
+
+
+        <div class="col-md-8 naslov" >
+           <h1 class="animate__animated animate__backInRight" id="glavninaslov">WEBSHOP</h1>
+        </div>
+
+    </div>
+</div>
+
+<% if (artikli_filter.length > 0 ) {%>
+
+    <section class="section-products" id="test">
+        <div class="container-fluid">
+            <div class="row justify-content-center text-center ">
+                <div class="col-md-8 col-lg-6 " >
+                    <div class="header">
+                        <h2>Artikli</h2>
+                        <h3>Filtrirani artikli</h3>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row d-flex justify-content-center" >
+                <!-- Single Product -->
+                <% for (let i = 0; i < artikli_filter.length; i++) {%>
+                <% if ( artikli_filter[i].dostupna_kolicina > 0 ) {%>
+                        <% let slika = artikli_filter[i].slike.split(',')[0]; console.info(slika) %>
+                        <div  id="<%=artikli_filter[i].artikalid%>"   class="col-md-6 col-lg-4 col-xl-3 product  animate__animated animate__bounceInRight" onclick="preusmjeri(this.id)">
+                            <div  class="product-slika bg-white border " style="background: url('/images/slike_artikala/<%=slika%>') no-repeat center;
+                                    background-size: cover"  >
+                                <% let razlika = Date.now() - artikli_filter[i].vrijeme_dodavanja %>
+                                <div class="part-1">
+
+                                    <%
+                                        // ako je dodat prije manje od 24h ima badge NOVO.
+                                    if ( (razlika / (1000 * 60 * 60*24) ) <= 1) { %>
+                                        <span class="badge rounded-pill bg-success">NOVO</span>
+
+                                    <% } %>
+                                </div>
+
+                            </div>
+                            <div class="part-2 ">
+                                <h3  class="product-title"><%= artikli_filter[i].artikal_naziv%></h3>
+                                <h4 class="product-price"><%=artikli_filter[i].cijena%> KM</h4>
+                            </div>
+                        </div>
+                <%}}%>
+
+
+
+            </div>
+        </div>
+    </section>
+        <%} else if (filter_artikli === true) {%>
+            <div class="row justify-content-center text-center">
+                <h3>Nema artikala sa ovim parametrima!</h3>
+            </div>
+
+<%}%>
+
+<section class="section-products" id="test">
+    <div class="container-fluid">
+        <div class="row justify-content-center text-center ">
+            <div class="col-md-8 col-lg-6 " >
+                <div class="header">
+                    <h2>Popularni artikli</h2>
+                    <h3>Samo najbolji artikli</h3>
+
+                </div>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center" >
+            <!-- Single Product -->
+            <% for (let i = 0; i < artikli.length; i++) {%>
+            <% if ( artikli[i].broj_prodaja > 0) { %>
+            <% let slika = artikli[i].slike.split(',')[0]; console.info(slika) %>
+            <div  id="<%=artikli[i].artikal_id%>"   class="col-md-6 col-lg-4 col-xl-3 product " onclick="preusmjeri(this.id)">
+                <div  class="product-slika bg-white border " style="background: url('/images/slike_artikala/<%=slika%>') no-repeat center;
+                        background-size: cover"  >
+                    <%
+                        let vrijeme = new Date(artikli[i].vrijeme_dodavanja)
+                        let danas = new Date();
+                    %>
+                    <div class="part-1">
+
+
+                        <%
+                            // ako je dodat na danasjni datum ima badge NOVO.
+                        if ( vrijeme.getFullYear() === danas.getFullYear() &&
+                                vrijeme.getMonth() === danas.getMonth() &&
+                                vrijeme.getDate() === danas.getDate() )
+                        { %>
+                            <span class="badge rounded-pill bg-success">NOVO</span>
+
+                        <% } %>
+                    </div>
+
+                </div>
+                <div class="part-2 ">
+                    <h3  class="product-title"><%= artikli[i].artikal_naziv%></h3>
+                    <h4 class="product-price"><%=artikli[i].cijena%> KM</h4>
+                </div>
+            </div>
+                <%}%>
+            <%}%>
+
+
+
+        </div>
+    </div>
+</section>
+
+<section class="section-products">
+
+   <%
+       if ( artikli.length > 3) {
+   let random_artikli = [];
+   let brojac = 0;
+   const broj_prikazanih = 4;
+   while ( brojac < broj_prikazanih) {
+       let rand_id = Math.floor(Math.random() * artikli.length);
+       if ( !(random_artikli.includes(rand_id))) {
+           random_artikli.push(rand_id);
+           brojac++;
+       }
+   }
+   %>
+
+    <div class="container-fluid">
+        <div class="row justify-content-center text-center ">
+            <div class="col-md-8 col-lg-6 " >
+                <div class="header">
+                    <h2>Slučajno odabrani artikli</h2>
+                    <h3>Nikada ne znate šta možete pronaći</h3>
+
+                </div>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center " >
+            <!-- Single Product -->
+            <% for (let i = 0; i < broj_prikazanih; i++) {%>
+
+                <% let slika = artikli[random_artikli[i]].slike.split(',')[0]; %>
+                <div  id="<%=artikli[random_artikli[i]].artikal_id%>"   class="col-md-6 col-lg-4 col-xl-3 product " onclick="preusmjeri(this.id)">
+                    <div  class="product-slika bg-white border " style="background: url('/images/slike_artikala/<%=slika%>') no-repeat center;
+                            background-size: cover"  >
+                        <%
+                            let vrijeme = new Date(artikli[i].vrijeme_dodavanja)
+                            let danas = new Date();
+                        %>
+                        <div class="part-1">
+
+
+                            <%
+                                // ako je dodat na danasjni datum ima badge NOVO.
+                            if ( vrijeme.getFullYear() === danas.getFullYear() &&
+                                    vrijeme.getMonth() === danas.getMonth() &&
+                                    vrijeme.getDate() === danas.getDate() )
+                            { %>
+                                <span class="badge rounded-pill bg-success">NOVO</span>
+
+                            <% } %>
+                        </div>
+
+                    </div>
+                    <div class="part-2 ">
+                        <h3  class="product-title"><%= artikli[random_artikli[i]].artikal_naziv%></h3>
+                        <h4 class="product-price"><%=artikli[random_artikli[i]].cijena%> KM</h4>
+                    </div>
+                </div>
+            <%}%>
+
+
+
+        </div>
+    </div>
+</section>
+<%}%>
+
+<% if ( tip === "kupac") { // ako je KUPAC ima dodatna sekcija za artikle preporucene po INTERESIMA %>
+<section class="section-products">
+    <div class="container-fluid">
+        <div class="row justify-content-center text-center ">
+            <div class="col-md-8 col-lg-6 " >
+                <div class="header">
+                    <h2>Preporučeni artikli za Vas</h2>
+                    <h3>Artikli koji odgovaraju vašim interesima</h3>
+
+                </div>
+            </div>
+        </div>
+        <%
+
+
+        %>
+        <div class="row d-flex justify-content-center" >
+            <!-- Single Product -->
+            <%
+                let postoji = false // ako je postoji false znaci da nema ni 1 artikal za koji je zainteresovan
+
+            for (let i = 0; i < artikli.length; i++) {
+                let prikazi = false;
+                let interesi = korisnik[0].interesi.split(',')
+                    console.log(interesi);
+                let lista_rijeci = []; // naziv,opis,kategorija i kljucne rijeci artikla
+                lista_rijeci.push(artikli[i].naziv.toLowerCase());
+                lista_rijeci.push(artikli[i].opis.toLowerCase());
+                lista_rijeci.push(artikli[i].kategorija_naziv.toLowerCase());
+                let klj_rijeci;
+                if ( artikli[i].kljucne_rijeci !== null) {
+                    klj_rijeci = artikli[i].kljucne_rijeci.toLowerCase();
+                }
+                lista_rijeci.push(klj_rijeci);
+                lista_rijeci = lista_rijeci.toString();
+                console.log(lista_rijeci);
+                if ( interesi[0] !== '') {
+                    for (let k = 0; k < interesi.length; k++) {
+                        if (lista_rijeci.includes(interesi[k].toLowerCase())) { // ako bar jedna kljucna rijec se nalazi u
+                            // nazivu ili opisu ili kategoriji ili kljucnim rijecima artikal treba prikazati
+                            prikazi = true
+                            postoji = true;
+                        }
+                    }
+                }
+                %>
+                <% if ( prikazi ) {
+
+                %>
+                <% let slika = artikli[i].slike.split(',')[0];  %>
+                <div  id="<%=artikli[i].artikal_id%>"   class="col-md-6 col-lg-4 col-xl-3 product " onclick="preusmjeri(this.id)">
+                    <div  class="product-slika bg-white border " style="background: url('/images/slike_artikala/<%=slika%>') no-repeat center;
+                            background-size: cover"  >
+                         <%
+                             let vrijeme = new Date(artikli[i].vrijeme_dodavanja)
+                             let danas = new Date();
+                         %>
+                        <div class="part-1">
+
+                            <%
+                                // ako je dodat na danasnji datum ima badge NOVO.
+                            if ( vrijeme.getFullYear() === danas.getFullYear() &&
+                                    vrijeme.getMonth() === danas.getMonth() &&
+                                    vrijeme.getDate() === danas.getDate() )
+                             { %>
+                            <span class="badge rounded-pill bg-success">NOVO</span>
+
+                            <% } %>
+                        </div>
+
+                    </div>
+                    <div class="part-2 ">
+                        <h3  class="product-title"><%= artikli[i].artikal_naziv%></h3>
+                        <h4 class="product-price"><%=artikli[i].cijena%> KM</h4>
+                    </div>
+                </div>
+            <%}%>
+            <%}
+            if ( !postoji) { %>
+            <div class="row justify-content-center text-center">
+                <h3>Nema artikala za preporuku po interesima! <a href="/home/profil/uredi"><button type="button">Uredi interese</button></a> </h3>
+            </div>
+
+              <%  }%>
+
+
+
+        </div>
+    </div>
+</section>
+<%}%>
+
+<%- include('footer.ejs') %>
+
+</body>
+
+</html>

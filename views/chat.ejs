@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="
+    sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+            integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/header.css'>
+    <link rel='stylesheet' href='/stylesheets/footer.css'>
+
+    <link rel='stylesheet' href='/stylesheets/chat.css'>
+
+
+</head>
+<body>
+<header>
+    <%- include('header.ejs', {tip : tip,id: id}) %>
+
+</header>
+<%- include('searchbar.ejs') %>
+
+<main class="content">
+    <div class="container p-0">
+
+
+        <div class="card">
+            <div class="row g-0">
+                <div class="col-12 chats col-lg-5 col-xl-3 border-right">
+
+                    <div class="px-4 d-none d-md-block">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <% for (let i = 0; i < chats.length; i++) {%>
+                    <% let ime = "";%>
+                    <%if ( chats[i].profilna_slika === null) { chats[i].profilna_slika = "default_profilna.png"  }%>
+                    <%if ( chats[i].username ) { ime = chats[i].username  }
+                    else if ( chats[i].ime_i_prezime) {
+                        ime = chats[i].ime_i_prezime
+                    }
+                    else { ime = "Admin" }
+
+                    %>
+
+                    <a href="#" id="chat_<%=chats[i].korisnik_id%>"   class="list-group-item list-group-item-action border-0 "
+
+                           onclick="otvorichat('<%=chats[i].korisnik_id%>','<%=chats[i].chat_grupa_id%>','<%=ime%>',
+                                   '<%=chats[i].profilna_slika%>')">
+                            <div class="d-flex align-items-start">
+                                 <img src="/images/profilne_slike/<%=chats[i].profilna_slika%>"
+                                     class="rounded-circle mr-1" alt="Profilna slika" width="40" height="40">
+                                <div class="flex-grow-1 ml-3 " >
+                                    <% if ( chats[i].username  ) {%>
+                                        <%=chats[i].username%>
+                                    <%} else if ( chats[i].ime_i_prezime  ) {%>
+                                        <%=chats[i].ime_i_prezime%>
+                                    <%} else {%>  <p style="color: red"> Admin</p> <%} %>
+                                </div>
+                            </div>
+                        </a>
+
+                    <%}%>
+
+
+                    <hr class="d-block d-lg-none mt-1 mb-0">
+                </div>
+                <div class="col-12 col-lg-7 col-xl-9">
+                    <div class="py-2 px-4 border-bottom d-none d-lg-block trenutni">
+                        <div class="d-flex align-items-center py-1">
+
+                            <div class="flex-grow-1 pl-3 ">
+                                <img id="slikaposaljioca" style="display: none" src = "/images/profilne_slike/default_profilna.png" class="rounded-circle mr-1" width="40" height="40">
+
+                                <strong id="stavi_ime" style="color: white"></strong>
+                            </div>
+
+                        </div>
+                    </div>
+                    <input type="hidden" value="0" id="chat_id">
+                    <input type="hidden" value="null" id="korisnik_id">
+
+                    <div class="position-relative">
+                        <div class="d-flex justify-content-center">
+
+                            <button onclick="ucitaj_stare()" id="stare_p" style="display: block" type="button" class="tipka btn btn-primary">Učitaj starije poruke</button>
+
+                        </div>
+                        <div class="chat-messages p-4" id="poruke">
+
+
+                        </div>
+
+                    </div>
+
+                    <div class="flex-grow-0 py-3 px-4 border-top">
+                        <div class="input-group">
+                            <input id="porukaslanje" type="text" class="form-control" placeholder="Napišite vašu poruku...">
+                            <button onclick="posalji()"  type="button" class="tipka btn btn-primary">Pošalji</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<div>
+
+</div>
+
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    function otvorichat(korisnik_id,chat_id,username,profilna) {
+
+        document.getElementById("chat_"+korisnik_id).style.fontWeight = 'normal';
+        document.getElementById("chat_id").value = chat_id;
+        document.getElementById("korisnik_id").value = parseInt(korisnik_id);
+        document.getElementById("slikaposaljioca").src = "/images/profilne_slike/"+profilna;
+        document.getElementById("slikaposaljioca").style.display = "block";
+        $.ajax({
+            type: "POST",
+            url: "/chat",
+            contentType : 'application/x-www-form-urlencoded',
+            data: {
+               chat_id : chat_id
+            },
+            success: function (result) {
+
+                let poruke = document.createElement("div");
+                poruke.id = "sve_poruke";
+                document.getElementById("stavi_ime").innerText = username ;
+                for (let i = result.poruke.length-1; i >= 0; i--) {
+
+                    let poruka = document.createElement("div")
+                    let datum = moment(result.poruke[i].vrijeme_slanja).fromNow();
+                    //moment(datum).format("hh:mm:ss")
+
+                    <% if ( !korisnik[0].profilna_slika ) {korisnik[0].profilna_slika = "default_profilna.png"}%>
+
+                    if ( result.poruke[i].poslao === <%=id%>) {
+                        poruka.innerHTML = '<div class="chat-message-right pb-4"> <div> <img src="/images/profilne_slike/<%=korisnik[0].profilna_slika%>" class="rounded-circle mr-1" alt="Profilna slika" width="40" height="40"> <div class="text-muted1 small text-nowrap mt-2">'+datum+'</div> </div>' +
+                            '<div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"> <div class="font-weight-bold mb-1">Vi</div>'+ result.poruke[i].poruka+'</div> </div>'
+
+                    }
+                    else {
+
+                        poruka.innerHTML = '<div class="chat-message-left pb-4"> <div> <img src="/images/profilne_slike/'+profilna+'" class="rounded-circle mr-1" alt="Profilna slika" width="40" height="40"> <div class="text-muted1 small text-nowrap mt-2">'+datum+'</div> </div>' +
+                            '<div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"> <div class="font-weight-bold mb-1">'+username+'</div>'+ result.poruke[i].poruka+'</div> </div>'
+                    }
+                    poruka.id =result.poruke[i].vrijeme_slanja;
+                    poruke.appendChild(poruka);
+
+                }
+                document.getElementById("poruke").innerHTML = "";
+                document.getElementById("poruke").appendChild(poruke);
+                if (document.getElementById("sve_poruke").childNodes.length === 0 ) {
+                        let x = document.createElement("div");
+                        x.innerHTML = '<h3 id="nemaporuka" style="display: block">Nemate poruka s ovim korisnikom.</h3>'
+                        document.getElementById("poruke").appendChild(x);
+                        document.getElementById("stare_p").style.display = "none";
+
+                }
+                else {
+                    document.getElementById("stare_p").style.display = "block";
+
+                }
+
+
+
+
+
+            }
+        });
+
+    }
+
+
+    var socket = io();
+
+    function posalji() {
+        // uzeti poruku koju je napisao,stavit je u event poruka
+        let poruka_za_slanje = document.getElementById("porukaslanje");
+        let korisnik_id = document.getElementById("korisnik_id").value;
+        let ima_poruka = document.getElementById("nemaporuka");
+        if (ima_poruka) {
+            document.getElementById("nemaporuka").style.display = "none";
+        }
+        <% if  ( tip  === "trgovac" ) { %>
+            socket.emit("poruka",poruka_za_slanje.value,korisnik_id,'<%=korisnik[0].username%>');
+        <% } %>
+         <%if (tip === "kupac" ) { %>
+            socket.emit("poruka", poruka_za_slanje.value,korisnik_id,'<%=korisnik[0].ime_i_prezime%>');
+
+        <%}
+        else { %>
+            socket.emit("poruka",poruka_za_slanje.value,korisnik_id,"Admin");
+        <%} %>
+
+        let chat_id = document.getElementById("chat_id").value;
+        $.ajax({
+            type: "POST",
+            url: "/chat/dodaj",
+            contentType: 'application/x-www-form-urlencoded',
+            data: {
+                chat_id: chat_id,
+                poruka : poruka_za_slanje.value,
+            },
+            success: function (){
+                let poslana_poruka = document.createElement("div");
+                poslana_poruka.innerHTML = '<div class="chat-message-right pb-4"> <div> <img src="/images/profilne_slike/<%=korisnik[0].profilna_slika%>" class="rounded-circle mr-1" alt="Profilna slika" width="40" height="40"> <div class="text-muted1 small text-nowrap mt-2">Upravo sada</div> </div>' +
+                    '<div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"> <div class="font-weight-bold mb-1">Vi</div>'+ poruka_za_slanje.value+'</div> </div>'
+                document.getElementById("poruke").appendChild(poslana_poruka);
+                poruka_za_slanje.value = "";
+
+            }
+
+
+        });
+
+    }
+
+    socket.on('poruka', function (poruka,korisnik_id,ime) {
+
+        let id = <%=id%>
+        if ( id=== parseInt(korisnik_id) ) { // ako je kome  salju poruku
+            if ( document.getElementById("stavi_ime").innerText === ime ) {
+                let msg = document.createElement("div")
+                let profilna = document.getElementById("slikaposaljioca").src.split("profilne_slike/")
+                console.log(profilna);
+                msg.innerHTML = '<div class="chat-message-left pb-4"> <div> <img src="/images/profilne_slike/'+profilna[1]+'" class="rounded-circle mr-1 slk"  alt="Profilna slika" width="40" height="40"> <div class="text-muted1 small text-nowrap mt-2">Upravo sada</div> </div>' +
+                    '<div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"> <div class="font-weight-bold mb-1">'+ime+'</div>'+ poruka+'</div> </div>'
+             document.getElementById("poruke").appendChild(msg);
+
+           }
+            else {
+                for (const a of document.querySelectorAll("a")) {
+                    if (a.textContent.includes(ime)) {
+                        a.style.fontWeight = '1000';
+
+                    }
+                }
+            }
+
+        }
+
+    });
+
+</script>
+<script> // ako nema nikako poruka
+    let provjeri_poruke = document.getElementById("poruke");
+    //console.log("?",provjeri_poruke.firstChild);
+    if ( provjeri_poruke.children.length === 0 ) {
+        document.getElementById("stare_p").style.display = "none";
+        let text = document.createElement("h3");
+        text.innerHTML = '<h3> Nemate poruka s korisnicima!</h3>'
+        poruke.appendChild(text);
+
+    }
+</script>
+
+<script>
+    <% if (  chats.length > 0) {%>
+        <%if (tip === "kupac" ) {%>
+    otvorichat('<%=chats[0].korisnik_id%>','<%=chats[0].chat_grupa_id%>','<%=chats[0].username%>',
+    '<%=chats[0].profilna_slika%>');
+    <%} else {%>
+    otvorichat('<%=chats[0].korisnik_id%>','<%=chats[0].chat_grupa_id%>','<%=chats[0].ime_i_prezime%>',
+        '<%=chats[0].profilna_slika%>');
+    <%}
+    }%>
+</script>
+
+<script>
+    function ucitaj_stare() {
+        let prva_poruka = document.getElementById("sve_poruke").firstChild;
+        console.log(prva_poruka);
+        let chat_id = document.getElementById("chat_id").value;
+        $.ajax({
+            type: "POST",
+            url: "/chat",
+            contentType: 'application/x-www-form-urlencoded',
+            data: {
+                chat_id: chat_id,
+                vrijeme_poruke : prva_poruka.id
+            },
+            success: function (result) {
+
+                for (let i = 0; i < result.poruke.length; i++) {
+
+                    let poruka = document.createElement("div")
+                    let datum = moment(result.poruke[i].vrijeme_slanja).fromNow();
+                    let ime = document.getElementById("stavi_ime").innerText;
+                    let profilna = document.getElementById("slikaposaljioca").src.split("profilne_slike/")[1];
+                    if (moment().isSame(moment(result.poruke[i].vrijeme_slanja), 'day')) {
+                        moment(datum).format("hh:mm:ss")
+                    }
+                    else { // u suprotnom datum
+                        moment(datum).format('DD/MM/YYYY');
+                    }
+                    if ( result.poruke[i].poslao === <%=id%>) {
+                        poruka.innerHTML = '<div class="chat-message-right pb-4"> <div> <img src="/images/profilne_slike/<%=korisnik[0].profilna_slika%>" class="rounded-circle mr-1" alt="Profilna slika" width="40" height="40"> <div class="text-muted1 small text-nowrap mt-2">'+datum+'</div> </div>' +
+                            '<div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"> <div class="font-weight-bold mb-1">Vi</div>'+ result.poruke[i].poruka+'</div> </div>'
+
+                    }
+                    else {
+
+                        poruka.innerHTML = '<div class="chat-message-left pb-4"> <div> <img src="/images/profilne_slike/'+profilna+'" class="rounded-circle mr-1" alt="Profilna slika" width="40" height="40"> <div class="text-muted1 small text-nowrap mt-2">'+datum+'</div> </div>' +
+                            '<div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3"> <div class="font-weight-bold mb-1">'+ime+'</div>'+ result.poruke[i].poruka+'</div> </div>'
+                    }
+                    poruka.id =result.poruke[i].vrijeme_slanja;
+                    document.getElementById("sve_poruke").insertBefore(poruka,document.getElementById("sve_poruke").firstChild);
+
+                }
+                //document.getElementById("sve_poruke").appendChild(poruke);
+
+            }
+
+        })
+    }
+</script>
+
+<%- include('footer.ejs') %>
+
+</body>
+</html>

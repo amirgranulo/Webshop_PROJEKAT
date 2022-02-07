@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="
+    sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/header.css'>
+    <link rel='stylesheet' href='/stylesheets/footer.css'>
+
+    <link rel='stylesheet' href='/stylesheets/uredi_profil.css'>
+
+
+</head>
+<body>
+<header>
+    <%- include('header.ejs', {tip : tip,id: id}) %>
+
+</header>
+<%- include('searchbar.ejs') %>
+
+<div class="menu container ">
+    <div class="row ">
+        <div class="col d-flex justify-content-center">
+
+            <a id="prsifru" href="/home/profil/uredi/sifra"> <button  class="tipka" type="button">Promjeni šifru</button> </a>
+
+        </div>
+    </div>
+
+<% if (tip === 'kupac') {%>
+    <div class="row">
+
+    <div class="col d-flex justify-content-center">
+
+    <form action="/home/profil/uredi" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="vrsta" value="naslovna">
+    <label class="lbl form-label" for="naslovna">Promjena naslovne slike</label>
+    <input  type="file" name="slika" id="naslovna" required accept="image/*"  class="form-control" />
+    <button class="tipka">POTVRDI</button>
+    </form>
+    </div>
+    </div>
+
+    <%}%>
+
+
+<div class="row">
+<div class="col d-flex justify-content-center">
+
+    <form action="/home/profil/uredi" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="vrsta" value="profilna">
+        <label class=" lbl form-label" for="profilna">Promjena profilne slike</label>
+        <input type="file" name="slika" id="profilna" required accept="image/*"  class="form-control" />
+        <button class="tipka">POTVRDI</button>
+    </form>
+
+</div>
+</div>
+    <% if ( tip === "kupac") {%>
+    <div class="row">
+
+    <div class="col d-flex justify-content-center">
+        <form action="/home/profil/uredi" method="POST">
+            <input type="hidden" name="vrsta" value="interesi">
+            <button id="interesitipka" onclick="prikazi()" class="tipka">UREDI INTERESE</button>
+            <% for (let i = 0; i < greske.length; i++) {%>
+            <div class=" alert alert-warning" role="alert">
+                <%=greske[i].msg%>
+            </div>
+            <%}%>
+
+            <label for="interesi">Interesi</label>
+        <input type="text" class="form-control" id="interesi" name="interesi" aria-describedby="textHelp" value="<%=korisnik_podaci[0].interesi%>">
+        <small id="textHelp" class="form-text text-muted">Interesi se unose kao riječi odvojene zarezom.Možete imati najviše 10 interesa.</small>
+        </form>
+
+    </div>
+    </div>
+
+    <%}%>
+</div>
+<%- include('footer.ejs') %>
+
+</body>
+</html>

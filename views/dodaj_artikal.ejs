@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Osnovne info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="
+    sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/header.css' />
+    <link rel='stylesheet' href='/stylesheets/footer.css'>
+    <link rel='stylesheet' href='/stylesheets/dodaj_artikal.css'>
+
+
+  </head>
+  <body>
+  <header>
+    <%- include('header.ejs', {tip : tip,id: id}); %>
+
+  </header>
+  <%- include('searchbar.ejs') %>
+    <div class="container artikal d-flex justify-content-center">
+
+
+    <form action="/artikal/dodaj"  method="POST" enctype="multipart/form-data">
+      <div class="col-md-2">
+        <% for (let i = 0; i < greske.length; i++) {%>
+        <div class="alert alert-warning" role="alert">
+          <%=greske[i].msg%>
+        </div>
+        <%}%>
+      </div>
+      <div class="form-group" id="glavnaforma">
+        <label for="naziv">Naziv artikla</label>
+        <input type="text" required class="form-control" name="naziv">
+        <label for="opis">Kratak opis vašeg artikla</label>
+        <textarea required maxlength="50" class="form-control" rows="2" name="opis"></textarea>
+        <label for="text">Cijena vašeg artikla</label>
+        <input type="number" required class="form-control" name="cijena">
+        <label for="kategorija">Kategorija vašeg artikla</label> <br>
+        <select class="form-select" id="kat"  required name="kategorija"  onclick="ucitaj_dodatne()">
+          <%for (let i = 0; i < kategorije.length; i++) {%>
+          <option value="<%=kategorije[i].id%>"><%=kategorije[i].naziv%></option>
+            <%}%>
+
+        </select>
+        <br>
+        <label for="text">Dostupna količina </label>
+        <input type="number" id="kol" class="form-control" name="kolicina" value="1">
+        <label class="form-label" for="slike">Dodajte najmanje jednu sliku</label>
+        <input type="file" name="slike" required accept="image/*" multiple class="form-control" />
+        <div class="md-form mb-5">
+          <label class="form-label" for="kljucne_rijeci">(Opcionalno) Unesite  ključne riječi razdvojene zarezom</label>
+          <input type="text"  title="Unesite rijeci razdvojene zarezom bez razmaka,dozvoljena su slova i brojevi." name="kljucne_rijeci"
+                 class="form-control validate" id="kljucne_rijeci" maxlength="100">
+          <small class="form-text text-muted infotext">Webshop će preporučiti ovaj artikal korisnicima koji su zainteresovani na osnovu
+            ključnih riječi.</small>
+
+        </div>
+        <button class="btn btn-success potvrdi" type="submit">DODAJ</button>
+
+      </div>
+      </form>
+      </div>
+
+    </body>
+
+  <script>
+  function ucitaj_dodatne() {
+    let kategorija_id = document.getElementById("kat").value;
+    $.ajax({
+      type: "POST",
+      url: "/artikal/dodatne",
+      contentType : 'application/x-www-form-urlencoded',
+
+      data: {
+        kategorija_id : kategorija_id
+
+      },
+      success: function (result) {
+        document.querySelectorAll('.dodatne').forEach(e => e.remove());
+
+        //element.parentNode.insertBefore(newElement, element.nextSibling);
+        let kategorije = document.getElementById("kat");
+        for (let i = 0; i < result.kategorije_dodatne_info.length; i++) {
+            let input = document.createElement('div');
+            input.className = "dodatne";
+            if (result.kategorije_dodatne_info[i].tip === "text") {
+              input.innerHTML += ' <label for="text">' +
+                      result.kategorije_dodatne_info[i].naziv +
+                      '</label> <input type="text"  class="form-control " name="' + result.kategorije_dodatne_info[i].id + '">';
+
+            }
+            else if( result.kategorije_dodatne_info[i].tip === "checkbox") {
+              // hidden input koji ce sluziti ako se ne checkira checkbox jer ako se ne checkira ne salje se u POST body
+              input.innerHTML += '  <input type="hidden" value="0" name="'+result.kategorije_dodatne_info[i].id +'"> <label for="checkbox">' +
+                      result.kategorije_dodatne_info[i].naziv +
+                      '</label> <input  type="checkbox" value="1"  class="form-control form-check-input " name="' + result.kategorije_dodatne_info[i].id + '">';
+            }
+          kategorije.parentNode.insertBefore(input,kategorije.nextSibling);
+
+
+        }
+
+      }
+    });
+
+  }
+
+  </script>
+
+
+  </script>
+  <%- include('footer.ejs') %>
+
+</html>

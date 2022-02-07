@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Artikal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="
+    sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/header.css'>
+    <link rel='stylesheet' href='/stylesheets/footer.css'>
+
+    <link rel='stylesheet' href='/stylesheets/artikal.css'>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,500;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+    <script>
+      function omoguci_edit() {
+        document.getElementById("uredi_naziv").innerHTML =
+                '<input class="form-control"  type="text" name="naziv" value="<%=artikal[0].artikal_naziv%>" >'
+        document.getElementById("uredi_naziv").style.border = "1px solid #00ac96";
+        document.getElementById("uredi_naziv").style.width = "20rem";
+
+        document.getElementById("uredi_cijena").innerHTML =
+                '<input class="form-control"  type="number" name="cijena" value="<%=artikal[0].cijena%>" >'
+        document.getElementById("uredi_cijena").style.border = "1px solid #00ac96";
+
+        document.getElementById("uredi_kolicina").innerHTML =
+                '<input class="form-control"  type="number" name="kolicina" value="<%=artikal[0].dostupna_kolicina%>" >'
+        document.getElementById("uredi_kolicina").style.border = "1px solid #00ac96";
+
+        document.getElementById("uredi_opis").readOnly = false;
+        document.getElementById("uredi_opis").style.border = "1px solid #00ac96";
+
+        document.getElementById("dodaj_sliku").style.display = "block";
+        document.getElementById("dodaj_sliku").style.marginTop = "10px";
+        document.getElementById("dodaj_sliku").style.border = "1px solid #00ac96";
+
+        document.getElementById("label_slika").style.display = "block";
+
+        document.getElementById("spasi").style.display = "block";
+
+
+      }
+    </script>
+
+    <script>
+      function obrisi_artikal() {
+        //console.log('brisem');
+        var sl =' <%=artikal[0].slike.split(',')%>'
+        console.log(sl);
+        $.ajax({
+          type: "POST",
+          url: "/artikal/obrisi/<%=artikal[0].artikal_id_main%>",
+          contentType : 'application/x-www-form-urlencoded',
+
+
+          data: {slike_brisanje :  sl},
+          success: function (result) {
+            console.log(result);
+            window.location =result.redirect;
+          }
+
+        });
+
+
+      }
+
+    </script>
+  </head>
+  <body>
+  <header>
+    <%- include('header.ejs', {tip : tip,id: id}) %>
+
+  </header>
+  <%- include('searchbar.ejs') %>
+
+
+
+   <div class="container-fluid glavni" >
+
+     <form action="/artikal/uredi" method="POST" enctype="multipart/form-data" >
+
+       <input type="hidden" name="id" value="<%=artikal[0].artikal_id_main%>">
+
+       <div class="row">
+      <div class="col-md-8" >
+        <div class="container">
+
+        <div class="row ">
+          <div class="col ">
+
+            <div  class="row sekcija" >
+              <div class="col ">
+                <h1 id="uredi_naziv"> <%=artikal[0].artikal_naziv%></h1>
+
+
+                <h3 style="text-align: center"> Osnovne informacije </h3>
+                <div class="row" >
+                  <div class="col-md-12 stavka kategorija" >
+                    <h4 ><i style="color: gray" class="fas fa-align-justify"></i> Kategorija</h4>
+                    <h4><%=artikal[0].kategorija_naziv%></h4>
+                  </div>
+
+                  <div class="col-md-12 stavka" id="cijena">
+                    <h4><i style="color:#1A652A;" class="fas fa-dollar-sign"></i> Cijena</h4>
+                    <h4 id="uredi_cijena"> <%=artikal[0].cijena%> KM</h4>
+                  </div>
+                  <div class="col-md-12 stavka " id="kolicina">
+                    <h4><i style="color: #ad8762" class="fas fa-boxes"></i>Količina</h4>
+
+                    <h3 id="uredi_kolicina"><%=artikal[0].dostupna_kolicina%></h3>
+                  </div>
+                  <div class="col-md-12 stavka" id="ocjena_prosjecna">
+                    <h4> Ocjena </h4>
+                    <% for (let i = 0; i < (artikal[0].zbir_ocjena/artikal[0].broj_ocjena ); i++) { %>
+                      <i id="ocjenanaslov" class="fas fa-star" style="height: 1.8rem"></i>
+                    <%} if ( artikal[0].broj_ocjena < 1 ) { %>
+                      <h4>Nema ocjena</h4>
+                    <%}%>
+                  </div>
+                  <div class="col-md-12 stavka">
+                    <h5>Vrijeme objave</h5>
+
+                    <p> <%= artikal[0].vrijeme_dodavanja.toString().slice(4,15) +' u'+ artikal[0].vrijeme_dodavanja.toString().slice(15,21)%></p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 slika">
+                <% let nizSlika = artikal[0].slike.split(',');%>
+
+                <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    <div class="carousel-item active">
+                      <img src="/images/slike_artikala/<%=nizSlika[0]%>" class="d-block w-100" alt="">
+
+                    </div>
+                    <% if (nizSlika.length > 1) {
+                    for (let i = 1; i < nizSlika.length; i++) { %>
+                    <div class="carousel-item ">
+                      <img src="/images/slike_artikala/<%=nizSlika[i]%>" class="d-block w-100" alt="">
+                    </div>
+
+                    <%  }}%>
+
+
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>
+                </div>
+
+                <label class="form-label" id="label_slika" style="display:none;" for="dodaj_sliku">Dodaj sliku</label>
+                <input type="file" id="dodaj_sliku" name="dodaj_sliku" style="display: none"
+                       accept="image/*" multiple class="form-control" />
+              </div>
+
+            </div>
+            <div class="row sekcija">
+              <h3>Opis </h3>
+              <textarea id="uredi_opis" name="opis" readonly> <%= artikal[0].opis%></textarea>
+
+
+            </div>
+
+          </div>
+          </div>
+
+
+          <div class="row">
+            <div class="col">
+
+
+            <div class=" row dodatneinfo">
+              <h3>Dodatne informacije</h3>
+              <%for (let i = 0; i < artikal.length ; i++) {%>
+                <%if (artikal[i].tip === "checkbox") {%>
+                  <%if (artikal[i].vrijednost === '0') {%>
+                    <div class="col-md-4 dodatne">
+                      <p> <%=artikal[i].stavka_naziv%> : <i class="check fas fa-times"></i> </p>
+                    </div>
+
+              <%} else {%>
+              <div class="col-md-4 dodatne">
+
+              <p> <%=artikal[i].stavka_naziv%> :  <i class="check fas fa-check"></i> </p>
+              </div>
+
+              <%}%>
+                <%} else {%>
+              <div class="col-md-4 dodatne">
+
+              <p> <%=artikal[i].stavka_naziv%> : <%=artikal[i].vrijednost%> </p>
+              </div>
+              <%}}%>
+              <div class="col 4 prazan"></div>
+            </div>
+
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 d-flex justify-content-center" id="trgovac">
+
+          <div class="card">
+            <img class="img-fluid"  src="/images/profilne_slike/<%=trgovac.profilna_slika%>"  style="width:100%">
+            <h1><%=trgovac.username%></h1>
+            <p  style="font-size: 1.5rem;" class="adresa">  <%=trgovac.adresa%></p>
+            <%  if (trgovac.id === id) {%>
+              <p><button type="button" onclick="omoguci_edit()" id="uredi">UREDI ARTIKAL</button></p>
+              <p><button type="submit" style="display: none" id="spasi">SPASI PROMJENE</button></p>
+              <p><button type="button" onclick="obrisi_artikal()" id="obrisi">OBRIŠI ARTIKAL</button></p>
+              <% if (artikal[0].dostupna_kolicina < 1) {%>
+
+                <span class="badge rounded-pill bg-danger">ZAVRŠENO</span>
+
+              <%}%>
+
+            <%} else {%>
+            <%if ( tip === "kupac" || tip === "admin") {%>
+              <p><button onclick="posalji_poruku()" type="button">POŠALJI PORUKU</button></p>
+            <%}%>
+            <p><button onclick="window.location='/profil/trgovac/<%=trgovac.id%>'" type="button">POGLEDAJ PROFIL</button></p>
+            <% if (artikal[0].dostupna_kolicina < 1) {%>
+
+              <span class="badge rounded-pill bg-danger">ZAVRŠENO</span>
+
+            <%}%>
+
+            <%if (tip === "kupac" && artikal[0].dostupna_kolicina > 0) {%>
+
+            <button id="korpa<%=artikal[0].artikal_id_main%>" onclick="korpa(this.id)" class=" korpa btn btn-outline-primary mt-2" type="button">Dodaj u korpu</button>
+
+
+            <div class="star-source">
+              <svg>
+                <linearGradient x1="50%" y1="5.41294643%" x2="87.5527344%" y2="65.4921875%" id="grad">
+                  <stop stop-color="black" offset="0%"></stop>
+                  <stop stop-color="black" offset="60%"></stop>
+                  <stop stop-color="black" offset="100%"></stop>
+                </linearGradient>
+                <symbol id="star" viewBox="153 89 106 108">
+                  <polygon id="star-shape" stroke="url(#grad)" stroke-width="5" fill="currentColor" points="206 162.5 176.610737 185.45085 189.356511 150.407797 158.447174 129.54915 195.713758 130.842203 206 95 216.286242 130.842203 253.552826 129.54915 222.643489 150.407797 235.389263 185.45085"></polygon>
+                </symbol>
+              </svg>
+
+            </div>
+
+            <div class="star-container" id="stars">
+              <input type="radio" onclick="ocjena(5)" name="star" id="five">
+              <label  for="five">
+                <svg id="5star" class="star">
+                  <use xlink:href="#star"/>
+                </svg>
+              </label>
+              <input type="radio" onclick="ocjena(4)"  name="star" id="four">
+              <label for="four">
+                <svg id="4star" class="star">
+                  <use xlink:href="#star"/>
+                </svg>
+              </label>
+              <input type="radio" onclick="ocjena(3)" name="star" id="three">
+              <label for="three">
+                <svg id="3star" class="star">
+                  <use xlink:href="#star"/>
+                </svg>
+              </label>
+              <input type="radio" onclick="ocjena(2)"  name="star" id="two">
+              <label for="two">
+                <svg id="2star" class="star">
+                  <use xlink:href="#star" />
+                </svg>
+              </label>
+              <input type="radio" onclick="ocjena(1)" name="star" id="one">
+              <label for="one">
+                <svg id="1star" class="star">
+                  <use xlink:href="#star" />
+                </svg>
+              </label>
+
+            </div>
+            <%}%>
+
+            <div class="alert alert-success" id="alert<%=artikal[0].artikal_id_main%>" style="display: none" role="alert">
+              Artikal je uspješno dodat u korpu!%>
+            </div>
+
+            <%}%>
+
+          </div>
+
+     </form>
+   </div>
+
+   </div>
+
+
+  </div>
+  <%- include('footer.ejs') %>
+
+  <script>
+    function ocjena(n) {
+
+      iziToast.success({
+        message: 'Uspješno ste ocijenili artikal!',
+        timeout: 2000,
+        backgroundColor: '#d90429'
+      });
+      $.ajax({
+        type: "POST",
+        url: "/artikal/prikaz/"+<%=artikal[0].artikal_id_main%>,
+        contentType : 'application/x-www-form-urlencoded',
+
+        data: {
+          ocjena : n,
+          kupac_id : <%=id%>
+
+        },
+        success: function (result) {
+
+
+        }
+      });
+    }
+
+    function posalji_poruku() {
+      $.ajax({
+        type: "POST",
+        url: "/chat/napravi_chat",
+        contentType : 'application/x-www-form-urlencoded',
+
+        data: {
+          korisnik1 : <%=id%>,
+          korisnik2 :<%=trgovac.id%>
+
+        },
+        success: function (result) {
+          window.location = "/chat";
+
+        }
+      });
+    }
+
+
+  </script>
+
+
+
+  </body>
+
+
+
+</html>

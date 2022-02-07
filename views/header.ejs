@@ -1,0 +1,132 @@
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+
+        <a id="naslov" class="navbar-brand" href="/home">     <i  class="fas fa-shopping-basket"></i >  WEBSHOP</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav">
+
+                <% if (tip !== 'admin') {%>
+                <li class="nav-item">
+                    <a class="nav-link" href="/profil/<%=tip%>/<%=id%>"><i class="fas fa-user"></i>  Moj profil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/home/profil/uredi"><i class="fas fa-user-edit"></i>  Uredi profil</a>
+                </li>
+                <%} else {%>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">  Admin panel</a>
+                    </li>
+
+                <%}%>
+                <li class="nav-item">
+                    <a class="nav-link" href="/chat"><i class="fas fa-envelope"></i>  Chat</a>
+                </li>
+
+            <% if (tip === 'trgovac') {%>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/artikal/dodaj">  Dodaj artikal</a>
+                    </li>
+                    <li class="nav-item">
+
+
+                        <a id="order" class="nav-link" href="/narudzbe/trgovac"><i class="fas fa-shipping-fast"></i>  Narudžbe</a>
+                    </li>
+                <%} else if ( tip === 'kupac') {%>
+                <li class="nav-item">
+                    <a class="nav-link" href="/korpa"><i class="fas fa-shopping-cart fa-lg" ></i>  Korpa</a>
+                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/narudzbe"><i class="fas fa-shipping-fast"></i>  Moje narudžbe</a>
+                    </li>
+                <%}%>
+                <li class="nav-item">
+                    <a class="nav-link" href="/home/logout"><i class="fas fa-sign-in-alt"></i>  Odjavi me</a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io();
+
+    socket.on('order', function(ids) {
+
+        let trg_id = "";
+        trg_id = <%=id%> // za svaki order order koji se napravi iz korpe emita se event ORDER
+        // ORDER(u sebi sadrz IDjeve trgovaca kojim pripada order)
+        // i u headeru(na svakoj stranici)
+        // se osluskuje taj event,ako je trgovac logovan i podudara se id,posalji notifikaciju.
+        if ( ids.includes(trg_id.toString())) {
+            document.getElementById("order").innerHTML += '<i  style="color:#e85d75" class="fas fa-cart-plus"></i>';
+
+            iziToast.show({
+                class: 'notifikacija',
+                title: 'Upravo ste dobili narudžbu!',
+                backgroundColor: '#E85D75',
+                theme: 'light', // dark
+                icon: 'fas fa-cart-plus',
+                position: 'topRight', // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
+                timeout: 7000,
+                pauseOnHover: false,
+
+            });
+
+        }
+
+
+    });
+
+
+    socket.on('poruka', function(poruka,korisnik_id,ime) {
+       if ( ime !== 'Admin') {
+            let id = <%= id %>
+            if (id === parseInt(korisnik_id)) {
+                iziToast.info({
+                    title: 'Poruka',
+                    message: ime + ' vam je poslao poruku!',
+                    backgroundColor : '#E85D75',
+                    timeout : 7000,
+                    pauseOnHover : false
+
+                });
+            }
+            if (korisnik_id === -1) {
+                iziToast.info({
+                    title: 'OBAVJEŠTENJE',
+                    message: poruka,
+                    backgroundColor : '#E85D75',
+                    timeout : 12000,
+                    pauseOnHover : false,
+                    position : 'topCenter'
+
+                });
+
+            }
+        }
+
+
+
+    });
+</script>
+
+</body>

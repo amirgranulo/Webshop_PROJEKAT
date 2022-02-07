@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<head>
+    <title>Admin - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="
+    sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+            integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/admin.css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+            integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js" integrity="sha512-TW5s0IT/IppJtu76UbysrBH9Hy/5X41OTAbQuffZFU6lQ1rdcLHzpU5BzVvr/YFykoiMYZVWlr/PX1mDcfM9Qg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!-- HTML !-->
+
+<nav class="navbar navbar-dark bg-primary">
+    <form action="/admin/logout" method="POST">
+        <button class="btn btn-success logout" type="submit" id="odjavi" role="button">ODJAVI SE</button>
+        <button type="button" onclick="preusmjeriHome()" class="btn btn-success">WEBSHOP</button>
+        <button type="button" onclick="preusmjeriChat()" class="btn btn-success">CHAT</button>
+
+    </form>
+</nav>
+<div class="container-fluid statswrapper">
+    <div id="stats">
+        <div class="d-flex justify-content-center">        <h2 class="heading animate__animated animate__jackInTheBox">DASHBOARD</h2>
+        </div>
+    <div class="row">
+
+        <div class="col chart" >
+            <canvas id="piechart"></canvas>
+            <script>
+
+                const ctx1 = document.getElementById('piechart');
+                const piechart = new Chart(ctx1, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Trgovci','Kupci'],
+                        datasets: [{
+                            label: '# of Votes',
+                            data: [<%=piechart[0].total%>,<%=piechart[1].total%>],
+                            backgroundColor: [
+                                'rgb(62, 146, 204)',
+                                'rgb(216, 49, 91)',
+
+                            ],
+                            borderColor: [
+                                'rgb(0,0,0)',
+                                'rgb(0,0,0)',
+
+
+                            ],
+                            hoverBorderColor : [ 'rgba(0,0,0,1)'],
+                            hoverOffset: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color : "white",
+                                    font: function (context) {
+                                        var avgSize = Math.round((context.chart.height + context.chart.width) / 2);
+                                        var size = Math.round(avgSize / 20);
+                                        size = size > 18 ? 18 : size; // max font size ce biti 18
+                                        return {
+                                            size: size,
+                                            weight: 'bold'
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            </script>
+
+        </div>
+        <div class="col chart"><canvas id="barchart" ></canvas>
+            <script>
+                var delayed;
+
+                const ctx2 = document.getElementById("barchart");
+                <%if (!barchart[0] ) { //  ako nema neke vrste ( ako se baza resetuje pa onda nece biti )
+                    // onda ne radi sve pa se mora dodati
+                    barchart.push({status : "Isporuceno",total : 0});
+
+                }%>
+                <%if (!barchart[1] ) {
+                    barchart.push({status : "Na cekanju",total : 0});
+
+                }%>
+                <%if (!barchart[2] ) {
+                    barchart.push({status : "Odbijeno",total : 0});
+
+                }%>
+                <%if (!barchart[3] ) {
+
+                    barchart.push({status : "Prihvaceno",total : 0});
+
+                }%>
+                const barchart  =new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: ['<%=barchart[0].status%>','<%=barchart[1].status%>','<%=barchart[2].status%>','<%=barchart[3].status%>'],
+                        datasets: [{
+                            label: 'Statusi narudzbi',
+                            data: [<%=barchart[0].total%>,<%=barchart[1].total%>,<%=barchart[2].total%>,<%=barchart[3].total%>],
+                            backgroundColor: [
+                                'rgba(0, 128, 0)',
+                                'rgba(255, 214, 10)',
+                                'rgb(216, 49, 91)',
+                                'rgb(62, 146, 204)'
+                            ],
+                            borderColor: [
+                                'rgba(0,0,0,1)',
+                                'rgba(0,0,0,1)',
+                                'rgba(0,0,0,1)',
+                                'rgba(0,0,0,1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive : true,
+                        maintainAspectRatio : false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color : "white",
+                                    font: function (context) {
+                                        var avgSize = Math.round((context.chart.height + context.chart.width) / 2);
+                                        var size = Math.round(avgSize / 20);
+                                        size = size > 18 ? 18 : size; // max font size ce biti 18
+                                        return {
+                                            size: size,
+                                            weight: 'bold'
+                                        };
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            onComplete: () => {
+                                delayed = true;
+                            },
+                            delay: (context) => {
+                                let delay = 0;
+                                if (context.type === 'data' && context.mode === 'default' && !delayed) {
+                                    delay = context.dataIndex * 300 + context.datasetIndex * 100;
+                                }
+                                return delay;
+                            },
+                        },
+                        scales: {
+                            x: {
+
+                                stacked: true,
+
+                                ticks : {
+                                    color : "white",
+
+                                    font: function (context) {
+                                        var avgSize = Math.round((context.chart.height + context.chart.width) / 2);
+                                        var size = Math.round(avgSize / 30);
+                                        size = size > 18 ? 18 : size; // max font size ce biti 18
+                                        return {
+                                            size: size,
+                                            weight: 'bold'
+                                        };
+                                    }
+                                }
+
+                            },
+                            y: {
+                                stacked: true,
+
+                                ticks : {
+                                    color : "white",
+
+                                    font: function (context) {
+                                        var avgSize = Math.round((context.chart.height + context.chart.width) / 2);
+                                        var size = Math.round(avgSize / 30);
+                                        size = size > 14 ? 14 : size; // max font size ce biti 18
+                                        return {
+                                            size: size,
+                                            weight : 'bold'
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+
+            </script>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col chart"><canvas id="linechart"></canvas>
+            <script>
+                let days = [];
+                let today = moment(); // biblioteka moment js, za dobijanje imena zadnjih 7 dana od danasnjeg dana.
+                for (i = 0; i < 7; i++){
+                    let day = today.subtract(i, 'days');
+                    days.push(day.format('dddd'));
+                }
+
+
+
+                const ctx3 = document.getElementById("linechart");
+
+                const data = {
+                    labels: days,
+                    datasets: [{
+                        label: 'Broj artikala zadnjih 7 dana.',
+                        data: [<%=linechart[6].broj_artikala%>,<%=linechart[5].broj_artikala%>,<%=linechart[4].broj_artikala%>,
+                            <%=linechart[3].broj_artikala%>,<%=linechart[2].broj_artikala%>,<%=linechart[1].broj_artikala%>,
+                            <%=linechart[0].broj_artikala%>],
+                        fill: false,
+                        borderColor: 'rgb(216, 49, 91)',
+                        tension: 0.1,
+                        backgroundColor :'rgb(216, 49, 91)',
+                        pointHoverBackgroundColor :'rgba(0,0,0,1)',
+                        pointHoverBorderWidth : 10,
+
+
+                    }]
+                };
+
+                const config = {
+                    type: 'line',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color : "white",
+                                    font: function (context) {
+                                        var avgSize = Math.round((context.chart.height + context.chart.width) / 2);
+                                        var size = Math.round(avgSize / 30);
+                                        size = size > 18 ? 18 : size; // max font size ce biti 18
+                                        return {
+                                            size: size,
+                                            weight: 'bold'
+                                        };
+                                    },
+                                }
+                            }
+                        },
+                        scales : {
+                            x: {
+                                ticks : {
+                                    color : "white",
+
+                                    font: function (context) {
+                                        var avgSize = Math.round((context.chart.height + context.chart.width) / 2);
+                                        var size = Math.round(avgSize / 30);
+                                        size = size > 18 ? 18 : size; // max font size ce biti 18
+                                        return {
+                                            size: size,
+                                            weight: 'bold'
+                                        };
+                                    }
+                                }
+                            },
+                            y : {
+                                ticks : {
+                                    color : "white",
+                                    font: function (context) {
+                                        var avgSize = Math.round((context.chart.height + context.chart.width) / 2);
+                                        var size = Math.round(avgSize / 30);
+                                        size = size > 14 ? 14 : size; // max font size ce biti 18
+                                        return {
+                                            size: size,
+                                            weight: 'bold',
+
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                };
+
+                const linechart = new Chart(ctx3,config);
+
+            </script>
+    </div>
+
+
+    </div>
+        <div class="row">
+            <div class="col d-flex justify-content-center">
+                        <h5 class="card-title tag">Broj korisnika : <br> <%=parseInt(piechart[0].total)+parseInt(piechart[1].total)%> </h5>
+            </div>
+            <div class="col d-flex justify-content-center">
+                        <h5 class="card-title tag" >Ukupna zarada:<br> <%=ukupna_zarada%> KM</h5>
+            </div>
+            <div class="col d-flex justify-content-center">
+
+                        <h5 class="card-title tag">Prosjecna cijena artikla: <br> <%=parseInt(stats_artikli.avg)%> KM</h5>
+            </div>
+            <div class="col d-flex justify-content-center">
+
+                        <h5 class="card-title tag">Najskuplji artikal: <br> <%=parseInt(stats_artikli.max)%> KM</h5>
+            </div>
+            <div class="col d-flex justify-content-center">
+
+                        <h5 class="card-title tag ">Najjeftiniji artikal: <br> <%=parseInt(stats_artikli.min)%> KM</h5>
+            </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col  d-flex justify-content-center">
+            <button type="button" id="poruka" onclick="poruka()"  class="btn btn-primary"><i class="fas fa-comment"></i> GLOBALNA PORUKA</button>
+            <button type="button" id="trgovci" onclick="prikaz('trgovac')" class="btn btn-primary"><i  class="fas fa-users"></i> TRGOVCI</button>
+            <button type="button" id="kupci"  onclick="prikaz('kupac')" class="btn btn-primary"><i  class="fas fa-users"></i> KUPCI</button>
+
+
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Dodaj kategoriju</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zatvori"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h5>Unesite naziv kategorije</h5>
+                            <input id="dodajkat" type="text" aria-label="Ime kategorije" class="form-control">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zatvori</button>
+                            <button type="button" onclick="dodajkategoriju()" data-bs-dismiss="modal" class="btn btn-primary">Dodaj</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col  d-flex justify-content-center">
+            <button type="button"  onclick="prikazikategorije()" class="btn btn-primary"><i  class="fas fa-users"></i> KATEGORIJE</button>
+
+            <button type="button"  data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary"><i class="fas fa-align-justify"></i> DODAJ KATEGORIJU</button>
+        </div>
+
+    </div>
+    <div class="row">
+
+        <div class="col " id="kategorije" style="display: none">
+
+            <div class="table-wrapper">
+
+            <table class="fl-table">
+                <thead>
+                <tr>
+                    <th>NAZIV</th>
+                    <th>UREDI</th>
+                    <th>OBRIŠI</th>
+
+                    <th>ATRIBUT</th>
+                </tr>
+                </thead>
+                <tbody>
+                <% for (let i = 0; i < kategorije.length; i++ ) {%>
+
+                <tr id="kategorija<%=kategorije[i].id%>">
+                    <td><input id="inputkat<%=kategorije[i].id%>" type="text" class="urediinput" value="<%=kategorije[i].naziv%>"></td>
+
+                    <td>
+                        <button onclick="uredi_kategoriju(<%=kategorije[i].id%>)" type="button" class="btn btn-success uredi"> UREDI</button>
+
+                    </td>
+                    <td>
+
+                        <i onclick="obrisi_kategoriju(<%=kategorije[i].id%>)" style="color:rgb(216, 49, 91)" class="fas fa-archive fa-lg"></i>
+
+                    </td>
+                    <td>
+                        <button type="button"
+                                onclick="document.getElementById('katatr').innerText = '<%=kategorije[i].naziv%>';
+                                document.getElementById('katatr').dataset.id= '<%=kategorije[i].id%>' "
+                                data-bs-toggle="modal" data-bs-target="#exampleModal1" class="btn btn-primary"> DODAJ ATRIBUT</button>
+
+                    </td>
+                </tr>
+
+
+
+
+                <%}%>
+
+                </tbody>
+            </table>
+
+                <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Dodaj atribut</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zatvori"></button>
+                            </div>
+                            <div class="modal-body">
+                                <h4 data-id="" id="katatr"></h4>
+                                <h5>Unesite naziv atributa</h5>
+                                <input id="dodajatr" type="text" aria-label="Ime atributa" class="form-control">
+                                <h5>Izaberite tip atributa</h5>
+
+                                <select required id="katatrtip" class="form-select" aria-label="Tip atributa">
+                                    <option value="text">Text</option>
+                                    <option value="checkbox">Checkbox</option>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zatvori</button>
+                                <button type="button" onclick="dodajatribut()" data-bs-dismiss="modal" class="btn btn-primary">Dodaj</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="col ">
+            <div  id="porukainput" class="input-group mb-3" style="display: none">
+                <input id="porukatext" type="text" minlength="1" class="form-control" placeholder="Unesite poruku"  >
+            </div>
+            <div class="table-wrapper" id="trgovcitabela" style="display: none">
+                <table class="fl-table">
+                    <thead>
+                    <tr>
+                        <th>SLIKA PROFILA</th>
+                        <th>KORISNIČKO IME</th>
+                        <th>OPCIJE</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for (let i = 0; i < trgovci.length; i++ ) {%>
+                    <%if ( trgovci[i].profilna_slika === null) { trgovci[i].profilna_slika = "default_profilna.png"} %>
+
+                    <tr id="<%=trgovci[i].id%>">
+                        <td><a href="/profil/trgovac/<%=trgovci[i].id%>"><img class="img-fluid rounded-circle my-n1"  src="/images/profilne_slike/<%=trgovci[i].profilna_slika%>"></a></td>
+                        <td> <input class="urediinput" id="input<%=trgovci[i].id%>"  type="text" value="<%=trgovci[i].username%> " >  </td>
+
+                        <td>
+
+                            <% if (  trgovci[i].arhiviran === 1 || trgovci[i].blok > Date.now() ) {%>
+                            <div id="sakrijUndo<%=trgovci[i].id%>">
+
+                            <button type="button" onclick="ponisti(<%=trgovci[i].id%>)" class="btn btn-success">  <i class="fas fa-undo"></i> PONIŠTI ZABRANE</button>
+                            </div>
+                            <div id="sakrijZabrane<%=trgovci[i].id%>" style="display: none">
+                                <button type="button"   title="Arhiviraj"  onclick="arhiviraj(<%=trgovci[i].id%>)" class="btn btn-danger"><i class="fas fa-archive"></i></button>
+                                <button type="button" title="Blokiraj na 15 dana" onclick="blokiraj(<%=trgovci[i].id%>,'privremeno')" class="btn btn-danger"><i class="fas fa-user-times"></i></button>
+                                <button type="button"  title="Blokiraj za stalno" onclick="blokiraj(<%=trgovci[i].id%>,'trajno')" class="btn btn-danger"><i class="fas fa-user-slash"></i></button>
+                            </div>
+
+                            <%} else {%>
+                            <div id="sakrijUndo<%=trgovci[i].id%>" style="display: none">
+                                <button type="button" onclick="ponisti(<%=trgovci[i].id%>)" class="btn btn-success">  <i class="fas fa-undo"></i> PONIŠTI ZABRANE</button>
+                            </div>
+                            <div id="sakrijZabrane<%=trgovci[i].id%>">
+                                <button type="button" title="Arhiviraj"  onclick="arhiviraj(<%=trgovci[i].id%>)" class="btn btn-danger"><i class="fas fa-archive"></i></button>
+                                <button type="button" title="Blokiraj na 15 dana" onclick="blokiraj(<%=trgovci[i].id%>,'privremeno')" class="btn btn-danger"><i class="fas fa-user-times"></i></button>
+                                <button type="button" title="Blokiraj za stalno" onclick="blokiraj(<%=trgovci[i].id%>,'trajno')" class="btn btn-danger"><i class="fas fa-user-slash"></i></button>
+                            </div>
+                            <%}%>
+                            <button onclick="uredi(<%=trgovci[i].id%>,'trgovac')" type="button" class="btn btn-success uredi"> UREDI</button>
+
+                        </td>
+
+
+                    </tr>
+                    <%}%>
+
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-wrapper" id="kupcitabela" style="display: none">
+                <table class="fl-table">
+                    <thead>
+                    <tr>
+                        <th>SLIKA PROFILA</th>
+                        <th>IME I PREZIME</th>
+                        <th>OPCIJE</th>
+
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for (let i = 0; i < kupci.length; i++ ) {%>
+                    <%if ( kupci[i].profilna_slika === null) { kupci[i].profilna_slika = "default_profilna.png"} %>
+
+                    <tr id="<%=kupci[i].id%>">
+                        <td><a href="/profil/kupac/<%=kupci[i].id%>"><img class="img-fluid rounded-circle my-n1"  src="/images/profilne_slike/<%=kupci[i].profilna_slika%>"> </a></td>
+
+                        <td><input class="urediinput" id="input<%=kupci[i].id%>"  type="text" value="<%=kupci[i].ime_i_prezime%> " ></td>
+
+                        <td>
+                            <% if ( kupci[i].arhiviran === 1 || kupci[i].blok.getTime() > Date.now() ) { %>
+                            <div id="sakrijUndo<%=kupci[i].id%>" style="display: block">
+                            <button type="button" onclick="ponisti(<%=kupci[i].id%>)" class="btn btn-success">  <i class="fas fa-undo"></i> PONIŠTI ZABRANE</button>
+                             </div>
+                            <div  id="sakrijZabrane<%=kupci[i].id%>" style="display: none">
+                            <button type="button"  title="Arhiviraj"  onclick="arhiviraj(<%=kupci[i].id%>)" class="btn btn-danger"><i class="fas fa-archive"></i></button>
+                            <button type="button"  title="Blokiraj na 15 dana" onclick="blokiraj(<%=kupci[i].id%>,'privremeno')" class="btn btn-danger"><i class="fas fa-user-times"></i></button>
+                            <button type="button"  title="Blokiraj za stalno" onclick="blokiraj(<%=kupci[i].id%>,'trajno')" class="btn btn-danger"><i class="fas fa-user-slash"></i></button>
+                            </div>
+                            <%}
+                            else { %>
+                            <div id="sakrijUndo<%=kupci[i].id%>" style="display: none">
+                            <button type="button"  onclick="ponisti(<%=kupci[i].id%>)" class="btn btn-success">  <i class="fas fa-undo"></i> PONIŠTI ZABRANE</button>
+                            </div>
+                            <div id="sakrijZabrane<%=kupci[i].id%>" style="display: block">
+                                <button type="button" title="Arhiviraj"  onclick="arhiviraj(<%=kupci[i].id%>)" class="btn btn-danger"><i class="fas fa-archive"></i></button>
+                             <button type="button" title="Blokiraj na 15 dana" onclick="blokiraj(<%=kupci[i].id%>,'privremeno')" class="btn btn-danger"><i class="fas fa-user-times"></i></button>
+                             <button type="button" title="Blokiraj za stalno" onclick="blokiraj(<%=kupci[i].id%>,'trajno')" class="btn btn-danger"><i class="fas fa-user-slash"></i></button>
+                            </div>
+
+                        <%}%>
+                            <button onclick="uredi(<%=kupci[i].id%>,'kupac')" type="button" class="btn btn-success uredi"> UREDI</button>
+
+                        </td>
+                    </tr>
+                    <%}%>
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+        var socket = io();
+
+        function poruka() {
+            document.getElementById("kategorije").style.display = "none";
+
+            let button = document.getElementById("poruka");
+            document.getElementById("trgovcitabela").style.display = "none";
+            document.getElementById("kupcitabela").style.display = "none";
+
+            if (button.innerText !== "POŠALJI") {
+                document.getElementById("porukainput").style.display = "block";
+                button.innerText = "POŠALJI";
+
+            }
+            else {
+                let poruka = document.getElementById("porukatext").value;
+                console.log(poruka);
+                socket.emit("poruka", poruka,-1,''); // -1 ce oznacavati admin poruku
+
+
+
+                document.getElementById("porukainput").style.display = "none";
+                button.innerHTML = '<i class="far fa-comment"></i>'
+                button.innerText = "GLOBALNA PORUKA";
+                 document.getElementById("porukatext").value = "";
+
+
+            }
+
+
+        }
+        function prikaz(tabela) {
+            document.getElementById("kategorije").style.display = "none";
+
+            let button = document.getElementById("poruka");
+            document.getElementById("porukainput").style.display = "none";
+            button.innerHTML = '<i class="far fa-comment"></i>'
+            button.innerText = "GLOBALNA PORUKA";
+            document.getElementById("porukatext").value = "";
+
+            if ( tabela === "kupac") {
+                document.getElementById("kupcitabela").style.display = "block";
+                document.getElementById("trgovcitabela").style.display = "none";
+            }
+            else {
+                document.getElementById("trgovcitabela").style.display = "block";
+                document.getElementById("kupcitabela").style.display = "none";
+            }
+
+        }
+        function  blokiraj(id,odluka) {
+            document.getElementById("sakrijUndo"+id).style.display = "block";
+            document.getElementById("sakrijZabrane"+id).style.display = "none";
+            let vrijeme_blokiranja;
+            if (odluka === 'trajno') {
+                vrijeme_blokiranja = "2099-01-01";
+
+            }
+            else { // na 15 dana
+
+                vrijeme_blokiranja = new Date();
+                vrijeme_blokiranja.setDate(vrijeme_blokiranja.getDate() +15);
+                vrijeme_blokiranja = moment(vrijeme_blokiranja).format('YYYY-MM-DD');
+
+               // console.info(vrijeme_blokiranja);
+            }
+            $.ajax({
+                type: "POST",
+                url: "/admin",
+                contentType : 'application/x-www-form-urlencoded',
+                data: {
+                    blokiraj_id : parseInt(id),
+                    vrijeme_blokiranja : vrijeme_blokiranja
+                },
+                success: function (result) {
+                }
+            });
+        }
+
+        function arhiviraj(id) {
+            document.getElementById("sakrijUndo"+id).style.display = "block";
+            document.getElementById("sakrijZabrane"+id).style.display = "none";
+            $.ajax({
+                type: "POST",
+                url: "/admin",
+                contentType : 'application/x-www-form-urlencoded',
+                data: {
+                    arhiviraj_id : parseInt(id),
+                },
+                success: function (result) {
+                }
+            });
+        }
+        function ponisti(id) { // ponistava zabrane tj arhiviranje i blok
+            document.getElementById("sakrijUndo"+id).style.display = "none";
+            document.getElementById("sakrijZabrane"+id).style.display = "block";
+            $.ajax({
+                type: "POST",
+                url: "/admin",
+                contentType : 'application/x-www-form-urlencoded',
+                data: {
+                    ponisti_id : parseInt(id),
+                },
+                success: function (result) {
+                }
+            });
+
+
+        }
+        function  preusmjeriChat() {
+            window.location = "/chat";
+        }
+        function  preusmjeriHome() {
+            window.location = "/home";
+        }
+
+        function uredi(id,tip) {
+            let ime = document.getElementById("input"+id).value;
+
+            $.ajax({
+                type: "POST",
+                url: "/admin",
+                contentType : 'application/x-www-form-urlencoded',
+                data: {
+                    novo_ime : ime,
+                    id_korisnika : id,
+                    tip_korisnika : tip
+                },
+                success: function (result) {
+                }
+            });
+
+        }
+
+        function dodajkategoriju() {
+            let naziv = document.getElementById("dodajkat").value;
+            $.ajax({
+                type: "POST",
+                url: "/admin",
+                contentType : 'application/x-www-form-urlencoded',
+
+                data: {
+                    naziv_kategorije: naziv
+
+                },
+                success: function (result) {
+
+
+                }
+            });
+
+        }
+
+        function prikazikategorije() {
+            document.getElementById("kategorije").style.display = "block";
+            document.getElementById("trgovcitabela").style.display = "none";
+            document.getElementById("kupcitabela").style.display = "none";
+            document.getElementById("porukainput").style.display = "none";
+
+        }
+
+        function obrisi_kategoriju(id) {
+            $.ajax({
+                type: "POST",
+                url: "/admin",
+                contentType : 'application/x-www-form-urlencoded',
+
+                data: {
+                    kategorija_id: id
+
+                },
+                success: function (result) {
+                    document.getElementById("kategorija"+id).style.display = "none";
+
+                }
+            });
+        }
+
+        function uredi_kategoriju(id) {
+            console.log("radi");
+            let naziv = document.getElementById("inputkat"+id).value;
+            $.ajax({
+                type: "POST",
+                url: "/admin",
+                contentType : 'application/x-www-form-urlencoded',
+
+                data: {
+                    kategorija_id: id,
+                    kategorija_naziv : naziv,
+                    uredi : true
+
+                },
+                success: function (result) {
+
+                }
+            });
+        }
+        function dodajatribut() {
+            let naziv = document.getElementById("dodajatr").value;
+            let tip = document.getElementById("katatrtip").value;
+
+            let kategorija = document.getElementById("katatr").dataset.id;
+            $.ajax({
+                type: "POST",
+                url: "/admin",
+                contentType : 'application/x-www-form-urlencoded',
+
+                data: {
+                    atribut: naziv,
+                    kategorija : kategorija,
+                    tip : tip
+
+                },
+                success: function (result) {
+
+
+                }
+            });
+
+        }
+
+    </script>
+
+</body>

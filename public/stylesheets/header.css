@@ -1,0 +1,21 @@
+.navbar {
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(to right, #00ac96, #00ac96,#094637); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    margin: 0 !important;
+    font-size: 1.2rem;
+}
+
+.nav-link {
+    color: white !important;
+}
+
+#naslov {
+    color: white !important;
+
+    text-shadow: #fff 0 0 10px;
+}
+
+.notifikacija {
+    background-color: red;
+    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Kupac</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="
+    sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/header.css'>
+    <link rel='stylesheet' href='/stylesheets/footer.css'>
+
+    <link rel='stylesheet' href='/stylesheets/kupac_profil.css'>
+
+
+</head>
+<body>
+<header>
+    <%- include('header.ejs', {tip : tip,id: id}) %>
+
+</header>
+<%- include('searchbar.ejs') %>
+
+<div class="container-fluid naslovna"  style="background-image: url('/images/naslovne_slike/<%=podaci.naslovna_slika%>');">
+
+</div>
+<div class="d-flex justify-content-center">
+    <div class="card">
+        <img class="img-fluid"  src="/images/profilne_slike/<%=podaci.profilna_slika%>"  style="width:100%">
+        <h1><%=podaci.ime_i_prezime%></h1>
+        <p class="adresa"><%=podaci.email%></p>
+        <%  if (podaci.id === id) {%>
+            <a href="/home/profil/uredi"><p><button class="tipka" type="button">UREDI PROFIL</button></p></a>
+        <%} else {%>
+            <% if ( tip === "trgovac" || tip === "admin" ) {%>
+            <p><button onclick="posalji_poruku()" type="button" class="tipka">POŠALJI PORUKU</button></p>
+        <%}}%>
+    </div>
+</div>
+<div class="profil container">
+
+    <div class="row">
+        <div class="col d-flex  br_artikala justify-content-center ">
+            <h4>Broj kupljenih artikala : <h4  class="broj"><%=broj_kupljenih['count']%></h4> </h4>
+
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col d-flex br_artikala justify-content-center">
+            <h4 >Broj ocjena artikala: <h4 class="broj"><%=broj_ocjena['count']%></h4></h4>
+
+        </div>
+
+    </div>
+
+    <%if (id === podaci.id ) {%>
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <h3>Moji interesi:</h3>
+
+        </div>
+    </div>
+    <div class="row ">
+        <div class="col d-flex justify-content-center">
+        <% if ( podaci.interesi !== '') {%>
+            <% var interesi = podaci.interesi.split(',')%>
+            <ul class="list-group  flex-column flex-sm-row">
+
+            <%for (let i = 0; i < interesi.length; i++) {%>
+
+            <li><span class="list-group-item  badge rounded-pill bg-primary"><h4 class="txt"><%=interesi[i]%></h4></span></li>
+
+            <%}}%>
+            </ul>
+    <% if (podaci.interesi === '') { %> <h3>Nemate unesenih interesa</h3> <%}%>
+    </div>
+        <div class="row ">
+            <div class="col d-flex justify-content-center">
+
+            <h3 class="text-small">Samo vi mozete vidjeti vaše interese.</h3>
+            </div>
+        </div>
+    </div>
+    <%}%>
+
+
+</div>
+<div>
+
+
+<%- include('footer.ejs') %>
+</div>
+
+<script>
+    function posalji_poruku() {
+        $.ajax({
+            type: "POST",
+            url: "/chat/napravi_chat",
+            contentType : 'application/x-www-form-urlencoded',
+
+            data: {
+                korisnik1 : <%=id%>,
+                korisnik2 :<%=podaci.id%>
+
+            },
+            success: function (result) {
+                window.location = "/chat";
+
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

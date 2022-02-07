@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Narudzbe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="
+    sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/header.css'>
+    <link rel='stylesheet' href='/stylesheets/footer.css'>
+    <link rel='stylesheet' href='/stylesheets/narudzbe.css'>
+
+    <script>
+        function preusmjeri(id) {
+            id = id.split('detalji')[1];
+            window.location.href = "/artikal/prikaz/"+id;
+        }
+    </script>
+    <script>
+        function otkazi(id) {
+
+            $.ajax({
+                type: "POST",
+                url: "/narudzbe/obrisi/",
+                contentType : 'application/x-www-form-urlencoded',
+
+                data: {order_id : id},
+                success: function (result) {
+                    document.getElementById("order"+id).remove();
+                }
+            });
+        }
+
+    </script>
+</head>
+<body>
+<header>
+    <%- include('header.ejs', {tip : tip,id: id}) %>
+
+</header>
+<div>
+    <%- include('searchbar.ejs') %>
+
+</div>
+<div class="container-fluid   ">
+
+
+
+    <% for ( x in podaci) {console.log(x)%>
+    <div class="row d-flex justify-content-center order" id="order<%=x%>">
+        <% let status = "";%>
+        <% let cijena = 0;%>
+        <% let profilna = ""%>
+        <% let ime = ""%>
+        <div class="trgovacwrapper">
+            <h1 class="trgovac"><%=podaci[x][0].username%></h1>
+
+        </div>
+        <% for (y in podaci[x]) {%>
+        <% status = podaci[x][y].status%>
+        <% profilna = podaci[x][y].profilna_slika%>
+        <% ime = podaci[x][y].username%>
+        <div class="col-md-12 artikal">
+            <div class="container-fluid ">
+        <div class=" row d-flex justify-content-center align-items-center" id="<%podaci[x][y].artikal_id%>">
+
+                        <div class="col-md-4 d-flex justify-content-center">
+                            <div class="row p-2  d-flex justify-content-center align-items-center ">
+                                <%  let prvaSlika = podaci[x][y].slike.split(",");%>
+                            </div>
+                            <div class="col-md-3 mt-1 slika_container"><img class="slika_artikla img-fluid .img-thumbnail" src="/images/slike_artikala/<%=prvaSlika[0]%>"></div>
+                        </div>
+                        <div class="col-md-8 d-flex justify-content-center">
+                            <div class="col-md-4 mt-1 naslovopis" >
+                                <h2><%=podaci[x][y].naziv%> </h2>
+                                <h5 class="text"> <%=podaci[x][y].opis%> </h5>
+                            </div>
+                            <div class="align-items-center align-content-center col-md-3 border-left mt-1">
+
+                                <div class="d-flex flex-row align-items-center">
+                                    <% cijena +=podaci[x][y].cijena * podaci[x][y].kolicina%>
+                                    <h5 class="mr-1">Ukupna cijena: <%= podaci[x][y].cijena * podaci[x][y].kolicina%> KM</h5>
+                                </div>
+                                <p class="text">Jedinična cijena: <%=podaci[x][y].cijena%> KM</p>
+
+                                <p class="text">Količina: <%=podaci[x][y].kolicina%></p>
+                                <div  class="d-flex flex-column mt-4"><button id="detalji<%=podaci[x][y].artikal_id%>"
+                                                                              onclick="preusmjeri(this.id)" type="button">DETALJI</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+       <%}%>
+        <div class="d-flex justify-content-center info ">
+
+            <div class="inf"><h2><%=status%></h2> </div>
+            <div class="inf"><h2><i class="fas fa-dollar-sign"></i> <%=cijena%> KM</h2> </div>
+
+            <% if ( status !== "Isporuceno") {%>
+                <div class="inf">
+
+                <button type="button" id="obrisi<%=x%>" onclick="otkazi(<%=x%>)" class="otkazi"><span class='text'>Obriši</span><span class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666
+                            3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/></svg></span></button>
+            <%} else {%>
+                <button type="button"  class="btn btn-primary ocijenibutton" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Ocijeni trgovca
+                </button>
+                </div>
+
+            <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered ">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="ocjenanaslov">OCJENA TRGOVCA</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body d-flex justify-content-center">
+
+                                <div class="card">
+                                    <div class="row">
+                                        <div class="col-10">
+                                            <div class="comment-box ml-2">
+                                                <h4 ><%=ime%></h4>
+                                                <form  id="forma" action="/narudzbe/" method="POST">
+                                                    <input name="order_id" type="hidden" value="<%=podaci[x][0].order_id%>">
+                                                    <input name="trgovac_id" type="hidden" value="<%=podaci[x][0].trgovac_id%>">
+
+                                                    <div class="rating"> <input type="radio" name="rating" value="5" required id="5"><label for="5">☆</label> <input type="radio" name="rating" value="4" id="4"><label for="4">☆</label> <input type="radio" name="rating" value="3" id="3"><label for="3">☆</label> <input type="radio" name="rating" value="2" id="2"><label for="2">☆</label> <input type="radio" name="rating" value="1" id="1"><label for="1">☆</label> </div>
+                                                <div class="comment-area"> <textarea required name="komentar" class="form-control" placeholder="Ovdje unesite komentar." rows="4"></textarea> </div>
+                                                <div class="comment-btns mt-2">
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="pull-left">  <button data-bs-dismiss="modal" class="btn cancel btn-success btn-sm">Zatvori</button> </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="pull-right"> <button type="submit"  class="btn btn-success send btn-sm">Potvrdi <i class="fa fa-long-arrow-right ml-1"></i></button> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            <%}%>
+        </div>
+
+    </div>
+    <%} %>
+
+</div>
+<%- include('footer.ejs') %>
+
+</body>
+</html>

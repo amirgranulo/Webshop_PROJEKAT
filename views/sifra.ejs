@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="
+    sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/header.css'>
+    <link rel='stylesheet' href='/stylesheets/footer.css'>
+    <link rel="stylesheet" href="/stylesheets/sifra.css">
+
+</head>
+<body>
+<header>
+    <%- include('header.ejs', {tip : tip,id: id}) %>
+
+</header>
+
+<%- include('searchbar.ejs') %>
+    <div class="container menu">
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <h2>Nakon promjene šifre biti ćete odjavljeni</h2>
+
+        </div>
+
+    </div>
+        <div class="row">
+            <div class="col d-flex justify-content-center">
+                <div class="alert alert-warning" role="alert">
+                    <%=message%>
+                </div>
+            </div>
+
+        </div>
+    <div class="row">
+      <div class="col d-flex justify-content-center">
+
+
+    <form action="/home/profil/uredi/sifra" method="POST">
+        <div class="form-group row">
+            <label for="trenutnipassword"  class="col-sm-2 lbl col-form-label">Unesite trenutnu šifru</label>
+            <div class="col">
+                <input type="password"  required class="form-control" name="trenutnipassword" >
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="novipassword" class="col-sm-2 lbl col-form-label">Unesite novu šifru</label>
+            <div class="col-sm-10">
+                <input type="password" required class="form-control" name="novipassword" >
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="ponovopassword" class="col-sm-2 lbl col-form-label">Unesite ponovo novu šifru</label>
+            <div class="col-sm-10">
+                <input type="password" required class="form-control" name="ponovopassword" >
+            </div>
+        </div>
+        <button id="potvrdi" class="btn btn-success">POTVRDI</button>
+        <button onclick="window.location.href = '/home/profil/uredi';" id="nazad" class="btn btn-danger" type="button">Vrati se nazad</button>
+    </form>
+      </div>
+
+    </div>
+
+    </div>
+
+<%- include('footer.ejs') %>
+
+</body>
+</html>

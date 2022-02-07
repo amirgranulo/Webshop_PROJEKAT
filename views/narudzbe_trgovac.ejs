@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Narudzbe vaše radnje</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="
+    sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+          integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/header.css'>
+    <link rel='stylesheet' href='/stylesheets/narudzbe_trgovac.css'>
+    <link rel='stylesheet' href='/stylesheets/footer.css'>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"
+            integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+
+
+</head>
+<body>
+<header>
+    <%- include('header.ejs', {tip : tip,id: id}) %>
+</header>
+<%- include('searchbar.ejs') %>
+
+<% let trgovac_arhiviran = 0;%>
+
+<div class="container all">
+    <%if (Object.getOwnPropertyNames(podaci).length === 0) { %>
+    <h1 class="d-flex justify-content-center">Nemate narudžbi!</h1> <%}%>
+<%for (x in podaci)  /* x je order*/ {%>
+    <div class="order  ">
+<h5>Narudžba ID:<%=x%></h5>
+    <%let ime_kupca = "";%>
+    <%let status = "";%>
+    <% let cijena = 0;%>
+    <%let profilna_slika = "";%>
+    <% let kupac_id = "";%>
+<div class="table-responsive" >
+    <table class="table  table-sm table-hover">
+        <thead>
+        <tr id="head">
+            <th scope="col">Artikal</th>
+            <th scope="col">Količina</th>
+            <th scope="col">Jedinična cijena</th>
+
+        </tr>
+        </thead>
+<%for (y in podaci[x]) {%>
+        <tbody>
+            <td  id ="artikli<%=podaci[x][y].kupac_id%>"><%=podaci[x][y].naziv%></td>
+            <td id="kolicina<%=podaci[x][y].kupac_id%>"><%=podaci[x][y].kolicina%>  </td>
+            <td   id="cijena<%=podaci[x][y].kupac_id%>"><%=podaci[x][y].cijena%> KM</td>
+            <% cijena += podaci[x][y].cijena * podaci[x][y].kolicina%>
+
+        </tr>
+        </tbody>
+            <% if ( podaci[x][y].trgovac_arhiviran === 1) { trgovac_arhiviran = 1}%>
+        <% ime_kupca = podaci[x][y].ime_i_prezime%>
+        <% status = podaci[x][y].status%>
+        <%   if (podaci[x][y].profilna_slika === null) {  podaci[x][y].profilna_slika = "default_profilna.png"}
+            profilna_slika = podaci[x][y].profilna_slika;
+        %>
+        <%  kupac_id = podaci[x][y].kupac_id%>
+
+        <%}%>
+
+</table>
+</div>
+<div>
+    <div class="row bottom">
+    <div class="col d-flex justify-content-center">
+
+
+    <h3 class="element"> <%=ime_kupca%></h3>
+
+        <a class="element" href="/profil/kupac/<%=kupac_id%>" >
+                <img src="/images/profilne_slike/<%=profilna_slika%>" width="40" height="40"
+                     class="rounded-circle my-n1" alt="Profilna slika">  </a>
+
+    <h3 class="element status" data-email ="<%=podaci[x][y].email%>"  id="status<%=x%>"> <%=status%></h3>
+        <div class="cijenawrapper" >
+            <h3 class="element" data-cijena=<%=cijena%> id="cijena<%=x%>"> <i class="fas fa-dollar-sign"></i><%=cijena%> KM</h3>
+
+        </div>
+    </div>
+    </div>
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+
+
+    <% if (status === "Na cekanju") { %>
+    <div id="sakrij<%=x%>">
+        <button onclick="narudzba('prihvati;<%=x%>')"
+                type="button"><i class="fas fa-check-circle fa-lg prihvati"></i></button>
+        <button onclick="narudzba('odbij;<%=x%>')"
+                type="button"><i class="fas fa-times-circle fa-lg odbij"></i></button>
+    </div>
+    <%}%>
+    <%if (status === "Prihvaceno") {%>
+    <script>
+
+        var isporuci_button_1 = document.createElement('div');
+        isporuci_button_1.innerHTML =     '<button class="btn btn-success btn-sm isporuci" onclick="isporuci(<%=x%>)" type="button">Isporuči<i class="fas fa-shipping-fast fa-sm"></i></button>'
+        document.getElementById("status<%=x%>").appendChild(isporuci_button_1);
+        </script> <%}%>
+
+        </div>
+    </div>
+
+</div>
+
+</div>
+<%}%>
+</div>
+    <script>
+
+    function narudzba(podaci) {
+
+        <% if (trgovac_arhiviran === 1) { %>
+            iziToast.warning({
+                message: 'Vaš profil je arhiviran, ne možete prodavati artikle',
+                icon :  "fas fa-exclamation-triangle",
+                position: "topCenter"
+
+            });
+       <% }
+        else { %>
+            podaci = podaci.split(';');
+            let odluka = podaci[0];
+            let order_id = podaci[1];
+            let email = document.getElementById("status" + order_id).dataset.email;
+
+            $.ajax({
+                type: "POST",
+                url: "/narudzbe/trgovac/obradi",
+                contentType: 'application/x-www-form-urlencoded',
+
+                data: {
+                    odluka: odluka,
+                    order_id: order_id,
+                    kupac_email: email
+                },
+                success: function (result) {
+                    //document.getElementById("alert"+id).style.display = "block";
+                    console.info(result.odluka);
+
+                    let text;
+                    if (result.odluka === "prihvati") {
+                        text = "Prihvaceno";
+                    } else if (result.odluka === "odbij") {
+                        text = "Odbijeno"
+                    }
+                    document.getElementById("status" + order_id).innerHTML = text;
+                    if (result.odluka === "prihvati") {
+                        var isporuci_button_2 = document.createElement('div');
+                        isporuci_button_2.innerHTML = '<br><button class="btn btn-success btn-sm" onclick="isporuci(' + order_id + ')" type="button">Isporuči<i class="fas fa-shipping-fast fa-sm"></i></button>'
+
+                        document.getElementById("status" + order_id).appendChild(isporuci_button_2);
+
+                    };
+                    document.getElementById("sakrij" + order_id).style.display = "none";
+
+
+                }
+
+            });
+        <%}%>
+
+    }
+
+</script>
+<script>
+    function isporuci(id) {
+        <%if ( trgovac_arhiviran === 1) { %>
+            iziToast.warning({
+                message: 'Vaš profil je arhiviran, ne možete prodavati artikle',
+                icon :  "fas fa-exclamation-triangle",
+                position: "topCenter",
+
+            });
+        <%}
+        else { %>
+            id = parseInt(id);
+
+            let ukupna_cijena =  document.getElementById("cijena"+id).dataset.cijena;
+            let email =  document.getElementById("status"+id).dataset.email;
+            console.info('emailkupca',email);
+            $.ajax({
+                type: "POST",
+                url: "/narudzbe/trgovac/obradi",
+                contentType : 'application/x-www-form-urlencoded',
+                data: {
+                    odluka :  "isporuceno",
+                    ukupna_cijena : ukupna_cijena,
+                    kupac_email : email,
+                    order_id : id
+                },
+                success: function (result) {
+                    document.getElementById("status"+id).innerHTML = "Isporuceno"
+
+                }
+            });
+        <%} %>
+    }
+</script>
+<%- include('footer.ejs') %>
+
+</body>
+</html>
