@@ -359,7 +359,22 @@
       });
     }
 
+    function korpa(id) {
+      id = id.split('korpa')[1];
+      console.info('korpa',id);
+      $.ajax({
+        type: "POST",
+        url: "/korpa/dodaj",
+        contentType : 'application/x-www-form-urlencoded',
 
+        data: {id :  id},
+        success: function (result) {
+          document.getElementById("alert"+id).style.display = "block";
+        }
+
+      });
+
+    }
   </script>
 
 
