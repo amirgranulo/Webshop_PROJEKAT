@@ -26,7 +26,10 @@ let statistika = {
                     where vrijeme_dodavanja > current_date - interval '7 days' group by dan;`,[],(err,result) => {
 
             if (err) { console.info(err);}
-            req.stats_brojevi_artikala = result.rows;
+            if (result.rows.length > 0) {
+                req.stats_brojevi_artikala = result.rows;
+            }
+            else req.stats_brojevi_artikala = []
             next();
         })
     },
@@ -55,7 +58,7 @@ router.get('/', autorizovan.potrebanAdminLogin,statistika.statistikaKorisnici,st
     pomocna.getSviTrgovci,pomocna.getSviKupci,pomocna.getKategorije,function(req, res, next) {
 
   brojac = 1; // ako ima dana da nema narudzbi length ce biti manje od 7 pa treba dodati onda dane sa 0 artikala
-  while ( req.stats_brojevi_artikala.length < 7) {
+  while ( req.stats_brojevi_artikala.length < 7 ) {
         req.stats_brojevi_artikala.push({broj_artikala : 0,dan: req.stats_brojevi_artikala[req.stats_brojevi_artikala.length-1].dan+brojac})
         brojac++;
   }
