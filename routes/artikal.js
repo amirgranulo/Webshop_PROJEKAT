@@ -202,7 +202,8 @@ withMessage("Interesi nisu ispravno uneseni!")],
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.render("dodaj_artikal",{title:"Dodaj artikal - Webshop", tip : req.session.tip,id :req.session.korisnik_id,greske : errors.array()})
+        return res.redirect("/artikal/dodaj")
+        // return res.render("dodaj_artikal",{title:"Dodaj artikal - Webshop", tip : req.session.tip,id :req.session.korisnik_id,greske : errors.array()})
         // next();
     }
 
