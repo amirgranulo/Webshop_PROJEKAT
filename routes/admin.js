@@ -17,7 +17,6 @@ let statistika = {
                     ON STATUS_ID = O_A.id GROUP BY o_a.status;`,[],(err,result) => {
             if (err) { console.info(err);}
             req.stats_statusi_artikala = result.rows;
-            console.info('wtf',req.stats_statusi_artikala);
             next();
         })
     },
@@ -27,7 +26,9 @@ let statistika = {
 
             if (err) { console.info(err);}
             if (result.rows.length) {
+                console.info(result.rows)
                 req.stats_brojevi_artikala = result.rows;
+
             }
             else req.stats_brojevi_artikala = []
             next();
@@ -58,7 +59,7 @@ router.get('/', autorizovan.potrebanAdminLogin,statistika.statistikaKorisnici,st
     pomocna.getSviTrgovci,pomocna.getSviKupci,pomocna.getKategorije,function(req, res, next) {
 
   brojac = 1; // ako ima dana da nema narudzbi length ce biti manje od 7 pa treba dodati onda dane sa 0 artikala
-  if (req.stats_brojevi_artikala !== []) {
+  if (req.stats_brojevi_artikala.length) {
       while (req.stats_brojevi_artikala.length < 7) {
           req.stats_brojevi_artikala.push({
               broj_artikala: 0,
@@ -66,12 +67,15 @@ router.get('/', autorizovan.potrebanAdminLogin,statistika.statistikaKorisnici,st
           })
           brojac++;
       }
-      let podaci = [];
+      /*let podaci = [];
       for (let i = 0; i < req.stats_brojevi_artikala.length; i++) {
           podaci.push(req.stats_brojevi_artikala[i].broj_artikala)
       }
       console.info(podaci);
+
+       */
   }
+  console.info('st',req.stats_brojevi_artikala)
 
 
     res.render('admin', {piechart : req.stats_korisnici, barchart : req.stats_statusi_artikala,
